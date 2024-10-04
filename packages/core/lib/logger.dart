@@ -1,4 +1,4 @@
-import 'package:segment_analytics/analytics.dart';
+import 'package:hightouch_events/analytics.dart';
 import 'package:logger/logger.dart';
 
 /// The foundation for building out a special logger. If logs need to be directed to a certain area, this is the
@@ -7,7 +7,7 @@ import 'package:logger/logger.dart';
 mixin LogTarget {
   /// Implement this method to process logging messages. This is where the logic for the target will be
   /// added. Feel free to add your own data queueing and offline storage.
-  /// - important: Use the Segment Network stack for Segment library compatibility and simplicity.
+  /// - important: Use the Hightouch Network stack for library compatibility and simplicity.
   void parseLog(LogMessage log);
 }
 
@@ -71,13 +71,13 @@ class SystemLogger with LogTarget {
   void parseLog(LogMessage log) {
     switch (log.kind) {
       case LogFilterKind.debug:
-        logger.d("Segment: ${log.message}");
+        logger.d("Hightouch: ${log.message}");
         break;
       case LogFilterKind.warning:
-        logger.w("Segment: ${log.message}");
+        logger.w("Hightouch: ${log.message}");
         break;
       case LogFilterKind.error:
-        logger.e("Segment: ${log.message}");
+        logger.e("Hightouch: ${log.message}");
         break;
     }
   }
@@ -86,8 +86,7 @@ class SystemLogger with LogTarget {
 class LogFactory {
   static LogTarget logger = SystemLogger();
 
-  static LogMessage buildLog(
-      LogDestination destination, String message, LogFilterKind kind) {
+  static LogMessage buildLog(LogDestination destination, String message, LogFilterKind kind) {
     switch (destination) {
       case LogDestination.log:
         return LogMessage(kind, message, LogDestination.log);
@@ -101,8 +100,7 @@ class LogFactory {
 
 void log(String message, {LogFilterKind? kind = LogFilterKind.debug}) {
   if (kind != LogFilterKind.debug || Analytics.debug) {
-    final log = LogFactory.buildLog(
-        LogDestination.log, message, kind ?? LogFilterKind.debug);
+    final log = LogFactory.buildLog(LogDestination.log, message, kind ?? LogFilterKind.debug);
     LogFactory.logger.parseLog(log);
   }
 }

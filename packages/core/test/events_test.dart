@@ -1,8 +1,8 @@
 import 'dart:convert';
 
-import 'package:segment_analytics/analytics_platform_interface.dart';
-import 'package:segment_analytics/event.dart';
-import 'package:segment_analytics/native_context.dart';
+import 'package:hightouch_events/analytics_platform_interface.dart';
+import 'package:hightouch_events/event.dart';
+import 'package:hightouch_events/native_context.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 class MockPlatform extends AnalyticsPlatform {
@@ -10,7 +10,7 @@ class MockPlatform extends AnalyticsPlatform {
   Future<NativeContext> getContext({bool collectDeviceId = false}) {
     final mockNativeContext = NativeContext();
     mockNativeContext.app = NativeContextApp();
-    mockNativeContext.app!.name = "Segment Example";
+    mockNativeContext.app!.name = "Hightouch Example";
     mockNativeContext.app!.version = "1.0";
     mockNativeContext.locale = "en_GB";
     mockNativeContext.os = NativeContextOS();
@@ -36,10 +36,8 @@ void main() {
       expect(context.app, isNotNull);
     });
     test("It flattens custom properties", () async {
-      final context = Context.fromNative(
-          await AnalyticsPlatform.instance.getContext(),
-          UserTraits(
-              firstName: "Christy", custom: {"myCustomTrait": "customValue"}));
+      final context = Context.fromNative(await AnalyticsPlatform.instance.getContext(),
+          UserTraits(firstName: "Christy", custom: {"myCustomTrait": "customValue"}));
 
       final contextJson = context.toJson();
 
@@ -48,11 +46,8 @@ void main() {
       expect(contextJson["traits"]["myCustomTrait"], "customValue");
     });
     test("It handles custom properties", () async {
-      final context = Context.fromNative(
-          await AnalyticsPlatform.instance.getContext(),
-          UserTraits(
-              firstName: "Christy",
-              custom: {"myCustomTrait": "customValue", "custom": "value"}));
+      final context = Context.fromNative(await AnalyticsPlatform.instance.getContext(),
+          UserTraits(firstName: "Christy", custom: {"myCustomTrait": "customValue", "custom": "value"}));
 
       final contextJson = context.toJson();
 
@@ -60,18 +55,15 @@ void main() {
       expect(contextJson["traits"]["custom"], "value");
     });
     test("JSON serialisation works with custom properties", () async {
-      final context = Context.fromNative(
-          await AnalyticsPlatform.instance.getContext(),
-          UserTraits(
-              firstName: "Christy",
-              custom: {"myCustomTrait": "customValue", "custom": "value"}));
+      final context = Context.fromNative(await AnalyticsPlatform.instance.getContext(),
+          UserTraits(firstName: "Christy", custom: {"myCustomTrait": "customValue", "custom": "value"}));
 
       final contextJson = context.toJson();
       final contextStr = jsonEncode(contextJson);
       final reverseContextJson = jsonDecode(contextStr);
       final reverseContext = Context.fromJson(reverseContextJson);
 
-      expect(context.app.name, "Segment Example");
+      expect(context.app.name, "Hightouch Example");
       expect(context.app.name, reverseContext.app.name);
 
       expect(context.traits.firstName, "Christy");
@@ -81,12 +73,10 @@ void main() {
       expect(reverseContext.traits.lastName, null);
 
       expect(context.traits.custom["myCustomTrait"], "customValue");
-      expect(context.traits.custom["myCustomTrait"],
-          reverseContext.traits.custom["myCustomTrait"]);
+      expect(context.traits.custom["myCustomTrait"], reverseContext.traits.custom["myCustomTrait"]);
 
       expect(context.traits.custom["custom"], "value");
-      expect(context.traits.custom["custom"],
-          reverseContext.traits.custom["custom"]);
+      expect(context.traits.custom["custom"], reverseContext.traits.custom["custom"]);
     });
   });
 }

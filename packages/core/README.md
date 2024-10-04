@@ -1,9 +1,6 @@
-# segment_analytics
+# events-sdk-flutter
 
-> **Warning**
-> This project is currently only available in Beta phase and is covered by Segment's First Access & Beta Preview Terms. We encourage you to try out this new library. Please provide feedback via Github issues/PRs, and feel free to submit pull requests.
-
-The hassle-free way to add Segment analytics to your Flutter[^1] app.
+The hassle-free way to add Hightouch Events to your Flutter[^1] app.
 
 Supports the following platforms:
 
@@ -16,10 +13,9 @@ Some destination plugins might not support all platform functionality. Refer to 
 
 ## Table of Contents
 
-- [segment_analytics](#segment_analytics)
+- [events-sdk-flutter](#events-sdk-flutter)
   - [Table of Contents](#table-of-contents)
   - [Installation](#installation)
-    - [Upgrading from Pilot](#upgrading-from-pilot)
     - [Permissions](#permissions)
   - [Usage](#usage)
     - [Setting up the client](#setting-up-the-client)
@@ -55,32 +51,10 @@ Some destination plugins might not support all platform functionality. Refer to 
 
 Run:
 
-`flutter pub add segment_analytics`
+`flutter pub add hightouch_events`
 
 ```dart
-import 'package:segment_analytics/client.dart';
-```
-
-### Upgrading from Pilot
-
-Since pilot phase we have renamed the package of this library from `analytics` to `segment_analytics`. Some changes have to be applied after upgrading to the v1 package:
-
-In your `pubspec.yaml` remove the `analytics` package and use `segment_analytics` instead.
-
-```diff
--   analytics:
--     git:
--       url: https://github.com/segmentio/analytics_flutter
--       ref: main
--       path: packages/core
-+   segment_analytics: ^1.0.1
-```
-
-In your dart files change the imports from `package:segment_analytics` to `package:segment_analytics`:
-
-```diff
-- import 'package:segment_analytics/client.dart';
-+ import 'package:segment_analytics/client.dart';
+import 'package:hightouch_events/client.dart';
 ```
 
 ### Permissions
@@ -100,10 +74,10 @@ In your app's `AndroidManifest.xml` add the below line between the `<manifest>` 
 
 ### Setting up the client
 
-The package exposes a method called `createClient` which we can use to create the Segment Analytics client. This central client manages all our tracking events. It is recommended you add this as a property on your main app's state class.
+The package exposes a method called `createClient` which we can use to create the Hightouch Events client. This central client manages all our tracking events. It is recommended you add this as a property on your main app's state class.
 
 ```dart
-const writeKey = 'SEGMENT_API_KEY';
+const writeKey = 'WRITE_KEY';
 final analytics = createClient(Configuration(writeKey));
 ```
 
@@ -112,28 +86,28 @@ You must pass at least the `writeKey`. Additional configuration options are list
 ### Client Options
 
 | Name                              | Default                       | Description                                                                                                                                                                                                                                                                     |
-| --------------------------------- | ----------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | 
-| `writeKey` **(REQUIRED)**         | ''                            | Your Segment API key.                                                                                                                                                                                                                                                           |
+| --------------------------------- | ----------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `writeKey` **(REQUIRED)**         | ''                            | Your Hightouch Events write key.                                                                                                                                                                                                                                                           |
 | `debug`                           | false                         | When set to false, it will not generate any info logs.                                                                                                                                                                                                                          |
 | `collectDeviceId`                 | false                         | Set to true to automatically collect the device ID from the DRM API on Android devices.                                                                                                                                                                                         |
 | `flushPolicies`                   | count=30,time=20s             | List of flush policies controlling when to send batches of events to the plugins                                                                                                                                                                                                |
-| `apiHost`                         | "api.segment.io/v1"           | Used to specify the regional Segment event endpoint                                                                                                                                                                                                                             |
-| `cdnHost`                         | "cdn-settings.segment.com/v1" | Used to specify the regional Segment settings endpoint                                                                                                                                                                                                                          |
+| `apiHost`                         | "https://us-east-1.hightouch-events.com"           | Used to specify the regional Hightouch Events endpoint                                                                                                                                                                                                                             |
+| `cdnHost`                         | "https://cdn-settings.hightouch-events.com" | Used to specify the regional Hightouch Events settings endpoint                                                                                                                                                                                                                          |
 | `errorHandler`                    | null                          | Custom error handler. By default logs errors to the standard flutter logger                                                                                                                                                                                                     |
-| `trackApplicationLifecycleEvents` | false                         | Enable automatic tracking for [app lifecycle events](https://segment.com/docs/connections/spec/mobile/#lifecycle-events): application installed, opened, updated, backgrounded)                                                                                                 |
+| `trackApplicationLifecycleEvents` | false                         | Enable automatic tracking for app lifecycle events: application installed, opened, updated, backgrounded)                                                                                                 |
 | `trackDeeplinks`                  | false                         | Enable automatic tracking for when the user opens the app via a deep link. \*NOTE: when sending this flag, the sdk plugin_appsflyer will ignore [onAppOpenAttribution](https://github.com/AppsFlyerSDK/appsflyer-flutter-plugin/blob/master/doc/Guides.md#Unified-deep-linking) |
-| `autoAddSegmentDestination`       | true                          | Set to false to skip adding the SegmentDestination plugin                                                                                                                                                                                                                       |
-| `defaultIntegrationSettings`      | null                          | Plugin settings that will be used if the request to get the settings from Segment fails.                                                                                                                                                                                        |
+| `autoAddHightouchDestination`       | true                          | Set to false to skip adding the HightouchDestination plugin                                                                                                                                                                                                                       |
+| `defaultIntegrationSettings`      | null                          | Plugin settings that will be used if the request to get the settings from Hightouch fails.                                                                                                                                                                                        |
 | `maxBatchSize`                    | true                          | 100 Maximum number of events to send to the API at once.                                                                                                                                                                                                                        |
 | `appStateStream`                  | null                          | Set to override the stream of application foreground or background events.                                                                                                                                                                                                      |
-| `requestFactory`                  | true                          | Set to override the factory to generate HTTP requests. Type: [RequestFactory](https://github.com/segmentio/analytics_flutter/blob/master/packages/core/lib/state.dart#L546)                                                                                                     |
+| `requestFactory`                  | true                          | Set to override the factory to generate HTTP requests. Type: [RequestFactory](https://github.com/ht-sdks/events-sdk-flutter/blob/master/packages/core/lib/state.dart#L546)                                                                                                     |
 | `storageJson`                     | true                          | Enable or disable automatic the generation JSON files for the serialization library                                                                                                                                                                                             |
 
 ## Client methods
 
 ### Track
 
-The [track](https://segment.com/docs/connections/spec/track/) method is how you record any actions your users perform, along with any properties that describe the action.
+The [track](https://hightouch.com/docs/events/event-spec#track-events) method is how you record any actions your users perform, along with any properties that describe the action.
 
 Method signature:
 
@@ -152,7 +126,7 @@ analytics.track("View Product", properties: {
 
 ### Screen
 
-The [screen](https://segment.com/docs/connections/spec/screen/) call lets you record whenever a user sees a screen in your mobile app, along with any properties about the screen.
+The [screen](https://hightouch.com/docs/events/event-spec#screen-events) call lets you record whenever a user sees a screen in your mobile app, along with any properties about the screen.
 
 Method signature:
 
@@ -172,7 +146,7 @@ For setting up automatic screen tracking, see the [instructions below](#automati
 
 ### Identify
 
-The [identify](https://segment.com/docs/connections/spec/identify/) call lets you tie a user to their actions and record traits about them. This includes a unique user ID and any optional traits you know about them like their email, name, etc. The traits option can include any information you might want to tie to the user, but when using any of the [reserved user traits](https://segment.com/docs/connections/spec/identify/#traits), you should make sure to only use them for their intended meaning. All reserved traits are strongly typed by the `UserTraits` class. When using traits not listsed as a reserved user trait, these will go under the `custom` property.
+The [identify](https://hightouch.com/docs/events/event-spec#identify-events) call lets you tie a user to their actions and record traits about them. This includes a unique user ID and any optional traits you know about them like their email, name, etc. The traits option can include any information you might want to tie to the user, but when using any of the reserved user traits, you should make sure to only use them for their intended meaning. All reserved traits are strongly typed by the `UserTraits` class. When using traits not listsed as a reserved user trait, these will go under the `custom` property.
 
 Method signature:
 
@@ -194,7 +168,7 @@ analytics.identify(userId: "testUserId", userTraits: UserTraits(
 
 ### Group
 
-The [group](https://segment.com/docs/connections/spec/group/) API call is how you associate an individual user with a group—be it a company, organization, account, project, team or whatever other crazy name you came up with for the same concept! This includes a unique group ID and any optional group traits you know about them like the company name industry, number of employees, etc. The traits option can include any information you might want to tie to the group, but when using any of the [reserved group traits](https://segment.com/docs/connections/spec/group/#traits), you should make sure to only use them for their intended meaning. All reserved traits are strongly typed by the `GroupTraits` class. When using traits not listsed as a reserved user trait, these will go under the `custom` property.
+The [group](https://hightouch.com/docs/events/event-spec#group-events) API call is how you associate an individual user with a group—be it a company, organization, account, project, team or whatever other crazy name you came up with for the same concept! This includes a unique group ID and any optional group traits you know about them like the company name industry, number of employees, etc. The traits option can include any information you might want to tie to the group, but when using any of the reserved group traits, you should make sure to only use them for their intended meaning. All reserved traits are strongly typed by the `GroupTraits` class. When using traits not listsed as a reserved user trait, these will go under the `custom` property.
 
 Method signature:
 
@@ -206,7 +180,7 @@ Example usage:
 
 ```dart
 analytics.group("some-company", groupTraits: GroupTraits(
-  name: 'Segment',
+  name: 'Hightouch',
   custom: {
     "region": "UK"
   }
@@ -215,7 +189,7 @@ analytics.group("some-company", groupTraits: GroupTraits(
 
 ### Alias
 
-The [alias](https://segment.com/docs/connections/spec/alias/) method is used to merge two user identities, effectively connecting two sets of user data as one. This is an advanced method, but it is required to manage user identities successfully in some of our destinations.
+The [alias](https://hightouch.com/docs/events/event-spec#alias-events) method is used to merge two user identities, effectively connecting two sets of user data as one. This is an advanced method, but it is required to manage user identities successfully in some of our destinations.
 
 Method signature:
 
@@ -279,7 +253,7 @@ analytics = createClient(Configuration(writeKey));
 
 If you don't do this, the old client instance would still exist and retain the timers, making all your events fire twice.
 
-Ideally, you shouldn't need this though, and the Segment client should be initialized only once in the application lifecycle.
+Ideally, you shouldn't need this though, and the Hightouch client should be initialized only once in the application lifecycle.
 
 ## Automatic screen tracking
 
@@ -293,7 +267,7 @@ return MaterialApp(navigatorObservers: [
 
 ## Plugins + Timeline architecture
 
-You have complete control over how the events are processed before being uploaded to the Segment API.
+You have complete control over how the events are processed before being uploaded to the Hightouch Events API.
 
 In order to customise what happens after an event is created, you can create and place various Plugins along the processing pipeline that an event goes through. This pipeline is referred to as a Timeline.
 
@@ -307,28 +281,28 @@ In order to customise what happens after an event is created, you can create and
 | after       | Executed after all event processing is completed. This can be used to perform cleanup operations, etc. |
 | utility     | Executed only when called manually, such as Logging.                                                   |
 
-Plugins can have their own native code (such as the iOS-only `analytics_plugin_idfa`) or wrap an underlying library (such as `analytics_plugin_firebase` which uses `firebase_core` and `firebase_analytics` under the hood)
+Plugins can have their own native code (such as the iOS-only `hightouch_events_plugin_idfa`) or wrap an underlying library (such as `hightouch_events_plugin_firebase` which uses `firebase_core` and `firebase_analytics` under the hood)
 
 ### Destination Plugins
 
-Segment is included as a `DestinationPlugin` out of the box. You can add as many other DestinationPlugins as you like, and upload events and data to them in addition to Segment.
+Hightouch is included as a `DestinationPlugin` out of the box. You can add as many other DestinationPlugins as you like, and upload events and data to them in addition to Hightouch.
 
-Or if you prefer, you can pass `autoAddSegmentDestination = false` in the options when setting up your client. This prevents the SegmentDestination plugin from being added automatically for you.
+Or if you prefer, you can pass `autoAddHightouchDestination = false` in the options when setting up your client. This prevents the HightouchDestination plugin from being added automatically for you.
 
 ### Adding Plugins
 
 You can add a plugin at any time through the `add()` method.
 
 ```dart
-import 'package:segment_analytics/client.dart';
-import 'package:segment_analytics/event.dart';
-import 'package:segment_analytics/state.dart';
-import 'package:segment_analytics_plugin_advertising_id/plugin_advertising_id.dart';
-import 'package:segment_analytics_plugin_idfa/plugin_idfa.dart';
-import 'package:segment_analytics_plugin_firebase/plugin_firebase.dart'
+import 'package:hightouch_events/client.dart';
+import 'package:hightouch_events/event.dart';
+import 'package:hightouch_events/state.dart';
+import 'package:hightouch_events_plugin_advertising_id/plugin_advertising_id.dart';
+import 'package:hightouch_events_plugin_idfa/plugin_idfa.dart';
+import 'package:hightouch_events_plugin_firebase/plugin_firebase.dart'
     show FirebaseDestination;
 
-const writeKey = 'SEGMENT_API_KEY';
+const writeKey = 'WRITE_KEY';
 
 class _MyAppState extends State<MyApp> {
   final analytics = createClient(Configuration(writeKey));
@@ -363,10 +337,10 @@ You can them customise the functionality by overriding different methods on the 
 ```dart
 import 'dart:convert';
 
-import 'package:segment_analytics/analytics.dart';
-import 'package:segment_analytics/event.dart';
-import 'package:segment_analytics/plugin.dart';
-import 'package:segment_analytics/logger.dart';
+import 'package:hightouch_events/analytics.dart';
+import 'package:hightouch_events/event.dart';
+import 'package:hightouch_events/plugin.dart';
+import 'package:hightouch_events/logger.dart';
 
 class EventLogger extends DestinationPlugin {
   var logKind = LogFilterKind.debug;
@@ -395,23 +369,23 @@ Refer to the following table for Plugins you can use to meet your tracking needs
 
 | Plugin                                                                                                                      | Package                           |
 | --------------------------------------------------------------------------------------------------------------------------- | --------------------------------- |
-| [Adjust](https://github.com/segmentio/analytics_flutter/tree/master/packages/plugins/plugin_adjust)                         | `analytics_plugin_adjust`         |
-| [AppsFlyer](https://github.com/segmentio/analytics_flutter/tree/master/packages/plugins/plugin_appsflyer)                   | `analytics_plugin_appsflyer`      |
-| [Firebase](https://github.com/segmentio/analytics_flutter/tree/master/packages/plugins/plugin_firebase)                     | `analytics_plugin_firebase`       |
-| [IDFA](https://github.com/segmentio/analytics_flutter/tree/master/packages/plugins/plugin_idfa)                             | `analytics_plugin_idfa`           |
-| [Android Advertising ID](https://github.com/segmentio/analytics_flutter/tree/master/packages/plugins/plugin_advertising_id) | `analytics_plugin_advertising-id` |
+| [Adjust](https://github.com/ht-sdks/events-sdk-flutter/tree/master/packages/plugins/plugin_adjust)                         | `hightouch_events_plugin_adjust`         |
+| [AppsFlyer](https://github.com/ht-sdks/events-sdk-flutter/tree/master/packages/plugins/plugin_appsflyer)                   | `hightouch_events_plugin_appsflyer`      |
+| [Firebase](https://github.com/ht-sdks/events-sdk-flutter/tree/master/packages/plugins/plugin_firebase)                     | `hightouch_events_plugin_firebase`       |
+| [IDFA](https://github.com/ht-sdks/events-sdk-flutter/tree/master/packages/plugins/plugin_idfa)                             | `hightouch_events_plugin_idfa`           |
+| [Android Advertising ID](https://github.com/ht-sdks/events-sdk-flutter/tree/master/packages/plugins/plugin_advertising_id) | `hightouch_events_plugin_advertising-id` |
 
 ## Controlling Upload With Flush Policies
 
 To more granurily control when events are uploaded you can use `FlushPolicies`
 
-A Flush Policy defines the strategy for deciding when to flush, this can be on an interval, on a certain time of day, after receiving a certain number of events or even after receiving a particular event. This gives you even more flexibility on when to send event to Segment.
+A Flush Policy defines the strategy for deciding when to flush, this can be on an interval, on a certain time of day, after receiving a certain number of events or even after receiving a particular event. This gives you even more flexibility on when to send event to Hightouch.
 
 To make use of flush policies you can set them in the configuration of the client:
 
 ```dart
-import 'package:segment_analytics/flush_policies/count_flush_policy.dart';
-import 'package:segment_analytics/flush_policies/timer_flush_policy.dart';
+import 'package:hightouch_events/flush_policies/count_flush_policy.dart';
+import 'package:hightouch_events/flush_policies/timer_flush_policy.dart';
 
 final analytics = createClient(Configuration(/*...*/, flushPolicies: [
   CountFlushPolicy(10),
@@ -459,8 +433,8 @@ and optionally can implement:
 They also have a `shouldFlush` boolean value. When this is set to true the client will atempt to upload events. Each policy should reset this value to `false` according to its own logic, although it is pretty common to do it inside the `reset` method.
 
 ```dart
-import 'package:segment_analytics/event.dart';
-import 'package:segment_analytics/flush_policies/flush_policy.dart';
+import 'package:hightouch_events/event.dart';
+import 'package:hightouch_events/flush_policies/flush_policy.dart';
 
 class FlushOnScreenEventsPolicy extends FlushPolicy {
 
@@ -486,7 +460,7 @@ class FlushOnScreenEventsPolicy extends FlushPolicy {
 By default any logging is done via the standard Flutter logging mechanism. To customise logging, you can build your own logger, which must implement the `LogTarget` mixin. For example:
 
 ```dart
-import 'package:segment_analytics/logger.dart';
+import 'package:hightouch_events/logger.dart';
 
 void customDebugLog(String msg) {
   // ...
@@ -505,13 +479,13 @@ class CustomLogger with LogTarget {
   void parseLog(LogMessage log) {
     switch (log.kind) {
       case LogFilterKind.debug:
-        customDebugLog("Segment: ${log.message}");
+        customDebugLog("Hightouch: ${log.message}");
         break;
       case LogFilterKind.warning:
-        customWarningLog("Segment: ${log.message}");
+        customWarningLog("Hightouch: ${log.message}");
         break;
       case LogFilterKind.error:
-        customErrorLog("Segment: ${log.message}");
+        customErrorLog("Hightouch: ${log.message}");
         break;
     }
   }
@@ -530,7 +504,7 @@ The error handler configuration receives a function which will get called whenev
 You can use this error handling to trigger different behaviours in the client when a problem occurs. For example if the client gets rate limited you could use the error handler to swap flush policies to be less aggressive:
 
 ```dart
-import 'package:segment_analytics/errors.dart';
+import 'package:hightouch_events/errors.dart';
 
 //...
 
@@ -558,7 +532,7 @@ final analytics = createClient(Configuration(writeKey),
 Plugins can also report errors to the handler by using the [`.error`](./lib/analytics.dart#L55) function of the analytics client, we recommend using the `PluginError` for consistency, and attaching the `innerError` with the actual exception that was hit:
 
 ```dart
-import 'package:segment_analytics/errors.dart';
+import 'package:hightouch_events/errors.dart';
 
 //...
 
@@ -588,6 +562,3 @@ Before contributing, please also see our [code of conduct](../../CODE_OF_CONDUCT
 MIT
 
 [^1]: The Flutter name and logo are trademarks owned by Google.
-
-[circleci-image]: TODO
-[circleci-url]: https://app.circleci.com/pipelines/github/segmentio/analytics-flutter
