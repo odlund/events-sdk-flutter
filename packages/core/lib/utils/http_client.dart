@@ -86,7 +86,7 @@ class HTTPClient {
     var request = http.Request(method, url);
     request.headers.addAll({
       "Content-Type": "application/json; charset=utf-8",
-      "User-Agent": "analytics-flutter/${Analytics.version()}",
+      "User-Agent": "events-sdk-flutter/${Analytics.version()}",
       "Accept-Encoding": "gzip"
     });
     if (body != null) {

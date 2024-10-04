@@ -1,169 +1,132 @@
-import 'package:events_example/config.dart';
-import 'package:hightouch_events/event.dart';
-import 'package:hightouch_events/state.dart';
 import 'package:flutter/material.dart';
-import 'dart:async';
 import 'package:hightouch_events/client.dart';
+import 'package:hightouch_events/state.dart';
 
 void main() {
   runApp(const MyApp());
 }
 
-class MyApp extends MaterialApp {
+class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
+  // This widget is the root of your application.
   @override
-  State<MyApp> createState() => _MyAppState();
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Flutter Demo',
+      theme: ThemeData(
+        // This is the theme of your application.
+        //
+        // TRY THIS: Try running your application with "flutter run". You'll see
+        // the application has a purple toolbar. Then, without quitting the app,
+        // try changing the seedColor in the colorScheme below to Colors.green
+        // and then invoke "hot reload" (save your changes or press the "hot
+        // reload" button in a Flutter-supported IDE, or press "r" if you used
+        // the command line to start the app).
+        //
+        // Notice that the counter didn't reset back to zero; the application
+        // state is not lost during the reload. To reset the state, use hot
+        // restart instead.
+        //
+        // This works for code too, not just values: Most code changes can be
+        // tested with just a hot reload.
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        useMaterial3: true,
+      ),
+      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+    );
+  }
 }
 
-class _MyAppState extends State<MyApp> {
-  final analytics = createClient(Configuration(writeKey, debug: true, trackApplicationLifecycleEvents: true));
+class MyHomePage extends StatefulWidget {
+  const MyHomePage({super.key, required this.title});
+
+  // This widget is the home page of your application. It is stateful, meaning
+  // that it has a State object (defined below) that contains fields that affect
+  // how it looks.
+
+  // This class is the configuration for the state. It holds the values (in this
+  // case the title) provided by the parent (in this case the App widget) and
+  // used by the build method of the State. Fields in a Widget subclass are
+  // always marked "final".
+
+  final String title;
 
   @override
-  void initState() {
-    super.initState();
-    initPlatformState();
-  }
+  State<MyHomePage> createState() => _MyHomePageState();
+}
 
-  // Platform messages are asynchronous, so we initialize in an async method.
-  Future<void> initPlatformState() async {
-    // If the widget was removed from the tree while the asynchronous platform
-    // message was in flight, we want to discard the reply rather than calling
-    // setState to update our non-existent appearance.
-    if (!mounted) return;
+class _MyHomePageState extends State<MyHomePage> {
+  final htevents =
+      createClient(Configuration("WRITE_KEY", debug: true, trackApplicationLifecycleEvents: true));
+
+  int _counter = 0;
+
+  void _incrementCounter() {
+    htevents.track("Increment", properties: {"prev": _counter});
+
+    setState(() {
+      // This call to setState tells the Flutter framework that something has
+      // changed in this State, which causes it to rerun the build method below
+      // so that the display can reflect the updated values. If we changed
+      // _counter without calling setState(), then the build method would not be
+      // called again, and so nothing would appear to happen.
+      _counter++;
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(navigatorObservers: [
-      ScreenObserver()
-    ], routes: {
-      '/': (context) => Scaffold(
-            appBar: AppBar(
-              title: const Text('Plugin example app'),
+    // This method is rerun every time setState is called, for instance as done
+    // by the _incrementCounter method above.
+    //
+    // The Flutter framework has been optimized to make rerunning build methods
+    // fast, so that you can just rebuild anything that needs updating rather
+    // than having to individually change instances of widgets.
+    return Scaffold(
+      appBar: AppBar(
+        // TRY THIS: Try changing the color here to a specific color (to
+        // Colors.amber, perhaps?) and trigger a hot reload to see the AppBar
+        // change color while the other colors stay the same.
+        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+        // Here we take the value from the MyHomePage object that was created by
+        // the App.build method, and use it to set our appbar title.
+        title: Text(widget.title),
+      ),
+      body: Center(
+        // Center is a layout widget. It takes a single child and positions it
+        // in the middle of the parent.
+        child: Column(
+          // Column is also a layout widget. It takes a list of children and
+          // arranges them vertically. By default, it sizes itself to fit its
+          // children horizontally, and tries to be as tall as its parent.
+          //
+          // Column has various properties to control how it sizes itself and
+          // how it positions its children. Here we use mainAxisAlignment to
+          // center the children vertically; the main axis here is the vertical
+          // axis because Columns are vertical (the cross axis would be
+          // horizontal).
+          //
+          // TRY THIS: Invoke "debug painting" (choose the "Toggle Debug Paint"
+          // action in the IDE, or press "p" in the console), to see the
+          // wireframe for each widget.
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            const Text(
+              'You have pushed the button this many times:',
             ),
-            body: Center(
-                child: Column(mainAxisSize: MainAxisSize.min, children: <Widget>[
-              TextButton(
-                onPressed: () {
-                  Navigator.pushNamed(context, "/next");
-                },
-                child: const Text('Next Screen'),
-              ),
-              TextButton(
-                onPressed: () {
-                  analytics.track("Test Event", properties: {"prop1": "value1"});
-                },
-                child: const Text('Track Product Viewed'),
-              ),
-              TextButton(
-                onPressed: () {
-                  analytics.track('Products Searched', properties: {"query": 'blue roses'});
-                  analytics.track('Product List Viewed', properties: {
-                    "list_id": 'hot_deals_1',
-                    "category": 'Deals',
-                    "products": [
-                      {
-                        "product_id": '507f1f77bcf86cd799439011',
-                        "sku": '45790-32',
-                        "name": 'Monopoly: 3rd Edition',
-                        "price": 19,
-                        "position": 1,
-                        "category": 'Games',
-                        "url": 'https://www.example.com/product/path',
-                        "image_url": 'https://www.example.com/product/path.jpg'
-                      },
-                      {
-                        "product_id": '505bd76785ebb509fc183733',
-                        "sku": '46493-32',
-                        "name": 'Uno Card Game',
-                        "price": 3,
-                        "position": 2,
-                        "category": 'Games'
-                      }
-                    ]
-                  });
-                  analytics.track('Promotion Viewed', properties: {
-                    "promotion_id": 'promo_1',
-                    "creative": 'top_banner_2',
-                    "name": '75% store-wide shoe sale',
-                    "position": 'home_banner_top'
-                  });
-                  analytics.track('Product Clicked', properties: {
-                    "product_id": '507f1f77bcf86cd799439011',
-                    "sku": 'G-32',
-                    "category": 'Games',
-                    "name": 'Monopoly: 3rd Edition',
-                    "brand": 'Hasbro',
-                    "variant": '200 pieces',
-                    "price": 18.99,
-                    "quantity": 1,
-                    "coupon": 'MAYDEALS',
-                    "position": 3,
-                    "url": 'https://www.example.com/product/path',
-                    "image_url": 'https://www.example.com/product/path.jpg'
-                  });
-                  analytics.track('Product Shared', properties: {
-                    "share_via": 'email',
-                    "share_message": 'Hey, check out this item',
-                    "recipient": 'friend@example.com',
-                    "product_id": '507f1f77bcf86cd799439011',
-                    "sku": 'G-32',
-                    "category": 'Games',
-                    "name": 'Monopoly: 3rd Edition',
-                    "brand": 'Hasbro',
-                    "variant": '200 pieces',
-                    "price": 18.99,
-                    "url": 'https://www.example.com/product/path',
-                    "image_url": 'https://www.example.com/product/path.jpg'
-                  });
-                  analytics.track('Cart Shared', properties: {
-                    "share_via": 'email',
-                    "share_message": 'Hey, check out this item',
-                    "recipient": 'friend@example.com',
-                    "cart_id": 'd92jd29jd92jd29j92d92jd',
-                    "products": [
-                      {"product_id": '507f1f77bcf86cd799439011'},
-                      {"product_id": '505bd76785ebb509fc183733'}
-                    ]
-                  });
-                },
-                child: const Text('Track eCommerce events'),
-              ),
-              TextButton(
-                onPressed: () {
-                  analytics.reset();
-                },
-                child: const Text('Reset'),
-              ),
-              TextButton(
-                onPressed: () {
-                  analytics.flush();
-                },
-                child: const Text('Flush'),
-              ),
-            ])),
-          ),
-      '/next': (context) => Scaffold(
-            appBar: AppBar(
-              title: const Text('Plugin example app'),
+            Text(
+              '$_counter',
+              style: Theme.of(context).textTheme.headlineMedium,
             ),
-            body: Center(
-                child: Column(mainAxisSize: MainAxisSize.min, children: <Widget>[
-              TextButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-                child: const Text('Next Screen'),
-              ),
-              TextButton(
-                onPressed: () {
-                  analytics.identify(userId: "testUserId", userTraits: UserTraits(name: "Test User"));
-                },
-                child: const Text('Identify Event'),
-              ),
-            ])),
-          )
-    });
+          ],
+        ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: _incrementCounter,
+        tooltip: 'Increment',
+        child: const Icon(Icons.add),
+      ), // This trailing comma makes auto-formatting nicer for build methods.
+    );
   }
 }

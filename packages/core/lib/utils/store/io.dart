@@ -56,7 +56,7 @@ class StoreImpl with Store {
 
   Future<String> _fileName(String fileKey) async {
     final path = (await _getDocumentDir()).path;
-    return "$path/analytics-flutter-$fileKey.json";
+    return "$path/events-sdk-flutter-$fileKey.json";
   }
 
   Future<RandomAccessFile?> _getFile(String fileKey, {bool create = false}) async {

@@ -22,7 +22,7 @@ class StoreImpl implements Store {
   }
 
   String _getFileName(String fileKey) {
-    return "analytics-flutter-$fileKey.json";
+    return "events-sdk-flutter-$fileKey.json";
   }
 
   void _writeToStorage(String fileKey, Map<String, dynamic> data) {
