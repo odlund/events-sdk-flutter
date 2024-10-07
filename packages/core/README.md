@@ -62,7 +62,7 @@ import 'package:hightouch_events/client.dart';
 <details>
 
 <summary>Android</summary>
-In your app's `AndroidManifest.xml` add the below line between the `<manifest>` tags.
+In your app's `AndroidManifest.xml` add the below line to the manifest:
 
 ```xml
 <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
