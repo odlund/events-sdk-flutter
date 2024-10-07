@@ -126,7 +126,7 @@ packages:
       path: "../packages/core"
       relative: true
     source: path
-    version: "1.0.0-dev.1"
+    version: "1.0.0-dev.2"
   http:
     dependency: transitive
     description:
