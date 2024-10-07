@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:hightouch_events/client.dart';
-import 'package:hightouch_events/state.dart';
 
 void main() {
   runApp(const MyApp());

@@ -11,6 +11,8 @@ import 'package:hightouch_events/state.dart';
 import 'package:hightouch_events/utils/store/store.dart';
 import 'package:flutter/widgets.dart';
 
+export 'package:hightouch_events/state.dart' show Configuration;
+
 Analytics createClient(Configuration configuration) {
   if (configuration.debug) {
     Analytics.debug = true;
