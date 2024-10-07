@@ -30,14 +30,14 @@ import java.util.*
 
 val WIDEVINE_UUID = UUID(-0x121074568629b532L, -0x5c37d8232ae2de13L)
 
-/** AnalyticsPlugin */
-class AnalyticsPlugin : FlutterPlugin, NativeContextApi, EventChannel.StreamHandler,  ActivityAware,
+/** HightouchEventsPlugin */
+class HightouchEventsPlugin : FlutterPlugin, NativeContextApi, EventChannel.StreamHandler,  ActivityAware,
     PluginRegistry.NewIntentListener {
     private var context: Context? = null
 
     private fun ByteArray.toHexString() = joinToString("") { "%02x".format(it) }
 
-    private val eventsChannel = "analytics/deep_link_events"
+    private val eventsChannel = "hightouch_events/deep_link_events"
 
     override fun onAttachedToEngine(flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
         context = flutterPluginBinding.applicationContext
