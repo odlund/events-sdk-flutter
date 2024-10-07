@@ -2,35 +2,27 @@ name: CI
 
 on:
   push:
-    branches:
-      - main
+    branches: [main]
   pull_request:
-    branches:
-      - main
+    branches: [main]
+  workflow_dispatch:
 
 jobs:
-  build_and_test:
-    name: Run Test
+  build:
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v4
-
-      - uses: actions/setup-java@v3
-        with:
-          distribution: "zulu"
-          java-version: "13.0.13+5"
 
       - uses: subosito/flutter-action@v2
         with:
           channel: stable
           flutter-version: 3.24.3
 
-      - name: Get dependencies
-        run: cd packages/core && flutter pub get
+      - run: flutter pub get
+        working-directory: packages/core
 
-      - name: Analyze Dart code
-        run: cd packages/core && flutter analyze
+      - run: flutter analyze
+        working-directory: packages/core
 
-      - name: Run unit tests
-        run: cd packages/core && flutter test
+      - run: flutter test
+        working-directory: packages/core
