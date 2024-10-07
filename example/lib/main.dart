@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hightouch_events/client.dart';
+import 'package:hightouch_events_plugin_advertising_id/plugin_advertising_id.dart' show PluginAdvertisingId;
+import 'package:hightouch_events_plugin_idfa/plugin_idfa.dart' show PluginIdfa;
 
 void main() {
   runApp(const MyApp());
@@ -72,6 +74,14 @@ class _MyHomePageState extends State<MyHomePage> {
       // called again, and so nothing would appear to happen.
       _counter++;
     });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+
+    htevents.addPlugin(PluginAdvertisingId());
+    htevents.addPlugin(PluginIdfa());
   }
 
   @override

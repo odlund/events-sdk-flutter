@@ -31,6 +31,16 @@ dependencies:
   flutter:
     sdk: flutter
   hightouch_events: ^1.0.0
+  hightouch_events_plugin_advertising_id:
+    git:
+      url: https://github.com/ht-sdks/events-sdk-flutter
+      ref: main
+      path: packages/plugins/plugin_advertising_id
+  hightouch_events_plugin_idfa:
+    git:
+      url: https://github.com/ht-sdks/events-sdk-flutter
+      ref: main
+      path: packages/plugins/plugin_idfa
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
