@@ -6,7 +6,7 @@ This is a monorepo containing all Hightouch packages
 
 ## Core (`hightouch_events`)
 
-The main [`hightouch_events](http://pub.dev/packages/hightouch_events) package.
+The main [`hightouch_events`](http://pub.dev/packages/hightouch_events) package.
 
 [Pub.dev](http://pub.dev/packages/hightouch_events)
 
@@ -16,31 +16,21 @@ The main [`hightouch_events](http://pub.dev/packages/hightouch_events) package.
 
 ### Adjust (`hightouch_events_plugin_adjust`)
 
-[Pub.dev](http://pub.dev/packages/hightouch_events_plugin_adjust)
-
 [Docs](packages/plugins/plugin_adjust#readme)
 
 ### AdvertisingID (`hightouch_events_plugin_advertising_id`)
-
-[Pub.dev](http://pub.dev/packages/hightouch_events_plugin_advertising_id)
 
 [Docs](packages/plugins/plugin_advertising_id#readme)
 
 ### AppsFlyer (`hightouch_events_plugin_appsflyer`)
 
-[Pub.dev](http://pub.dev/packages/hightouch_events_plugin_appsflyer)
-
 [Docs](packages/plugins/plugin_appsflyer#readme)
 
 ### Firebase (`hightouch_events_plugin_firebase`)
 
-[Pub.dev](http://pub.dev/packages/hightouch_events_plugin_firebase)
-
 [Docs](packages/plugins/plugin_firebase#readme)
 
 ### IDFA (`hightouch_events_plugin_idfa`)
-
-[Pub.dev](http://pub.dev/packages/hightouch_events_plugin_idfa)
 
 [Docs](packages/plugins/plugin_idfa#readme)
 
