@@ -1,8 +1,8 @@
 # Publish
 
 1. Update `version:` in `pubspec.yaml`
-   - For publishing `packages/core` only, you also need to update `hightouchVersion` in [`version.dart`](packages/core/lib/version.dart)
-2. Run publish command inside package directory
+1. Update `hightouchVersion` in [`version.dart`](packages/core/lib/version.dart)
+1. Run publish command inside `packages/core`
    ```sh
    flutter pub publish # use --dry-run to preview publish
    ```
