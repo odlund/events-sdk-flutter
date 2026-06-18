@@ -4,6 +4,8 @@ import 'package:hightouch_events/errors.dart';
 import 'package:hightouch_events/event.dart';
 import 'package:hightouch_events/flush_policies/flush_policy.dart';
 import 'package:hightouch_events/logger.dart';
+import 'package:hightouch_events/plugins/session/session_state.dart';
+import 'package:hightouch_events/utils/lifecycle/app_state_stream_multiplexer.dart';
 import 'package:hightouch_events/utils/lifecycle/lifecycle.dart';
 import 'package:flutter/foundation.dart';
 import 'package:state_notifier/state_notifier.dart';
@@ -26,11 +28,13 @@ class StateManager {
   final SystemState system;
   final FiltersState filters;
   final DeepLinkDataState deepLinkData;
+  final SessionStateState sessionState;
   final UserInfoState userInfo;
 
   void init(ErrorHandler errorHandler, bool storageJson) {
     filters.init(errorHandler, storageJson);
     deepLinkData.init(errorHandler, storageJson);
+    sessionState.init(errorHandler, storageJson);
     userInfo.init(errorHandler, storageJson);
     context.init(errorHandler, storageJson);
   }
@@ -41,10 +45,34 @@ class StateManager {
         integrations = IntegrationsState({}),
         filters = FiltersState(store),
         deepLinkData = DeepLinkDataState(store),
+        sessionState = SessionStateState(store),
         userInfo = UserInfoState(store),
         context = ContextState(store, configuration) {
-    _ready = Future.wait<void>([filters.ready, deepLinkData.ready, userInfo.ready, context.ready])
-        .then((_) => _isReady = true);
+    _ready = Future.wait<void>([
+      filters.ready,
+      deepLinkData.ready,
+      sessionState.ready,
+      userInfo.ready,
+      context.ready
+    ]).then((_) => _isReady = true);
+  }
+
+  AppStateStreamMultiplexer? _appStateStreamMultiplexer;
+
+  StreamSubscription<AppStatus> listenAppState(void Function(AppStatus) onData) {
+    final factory = configuration.state.appStateStream;
+    if (factory == null) {
+      return lifecycle.listen(onData);
+    }
+
+    _appStateStreamMultiplexer ??=
+        AppStateStreamMultiplexer.fromFactory(factory);
+    return _appStateStreamMultiplexer!.listen(onData);
+  }
+
+  Future<void> disposeAppStateStreamMultiplexer() async {
+    await _appStateStreamMultiplexer?.dispose();
+    _appStateStreamMultiplexer = null;
   }
 }
 
@@ -142,6 +170,9 @@ abstract class PersistedState<T> implements AsyncStateNotifier<T> {
       return Future.error(_error as Object);
     }
     final s = _notifier.state;
+    if (isReady) {
+      return s as T;
+    }
     if (s == null) {
       if (_getCompleter == null) {
         final completer = Completer<T>();
@@ -325,6 +356,23 @@ class UserInfo {
   Map<String, dynamic> toJson() => _$UserInfoToJson(this);
 }
 
+class SessionStateState extends PersistedState<SessionState?> {
+  SessionStateState(Store store)
+      : super("sessionState", store, () async {
+          return null;
+        });
+
+  @override
+  SessionState? fromJson(Map<String, dynamic> json) {
+    return json.isEmpty ? null : SessionState.fromJson(json);
+  }
+
+  @override
+  Map<String, dynamic> toJson(SessionState? t) {
+    return t?.toJson() ?? {};
+  }
+}
+
 class DeepLinkDataState extends PersistedState<DeepLinkData> {
   DeepLinkDataState(Store store)
       : super("deepLinkData", store, () async {
@@ -499,12 +547,16 @@ class ConfigurationState extends StateNotifier<Configuration> {
 }
 
 class Configuration {
+  static const int defaultSessionTimeout = 30 * 60 * 1000;
+
   final String writeKey;
   final bool debug;
 
   final bool collectDeviceId;
   final bool trackApplicationLifecycleEvents;
   final bool trackDeeplinks;
+  final int foregroundSessionTimeout;
+  final int backgroundSessionTimeout;
   final List<FlushPolicy>? flushPolicies;
 
   final int? maxBatchSize;
@@ -514,7 +566,7 @@ class Configuration {
   final String cdnHost;
 
   final RequestFactory? requestFactory;
-  final StreamSubscription<AppStatus> Function()? appStateStream;
+  final AppStateStreamFactory? appStateStream;
   final ErrorHandler? errorHandler;
   final bool? storageJson;
 
@@ -532,6 +584,8 @@ class Configuration {
       this.requestFactory,
       this.trackApplicationLifecycleEvents = false,
       this.trackDeeplinks = false,
+      this.foregroundSessionTimeout = defaultSessionTimeout,
+      this.backgroundSessionTimeout = defaultSessionTimeout,
       this.debug = false,
       this.maxBatchSize,
       this.storageJson = true,
@@ -540,16 +594,22 @@ class Configuration {
 
 typedef ErrorHandler = void Function(Exception);
 typedef RequestFactory = Request Function(Request);
+typedef AppStateStreamFactory = StreamSubscription<AppStatus> Function(
+    void Function(AppStatus) onData);
 
 Configuration setFlushPolicies(Configuration a, List<FlushPolicy> flushPolicies) {
   return Configuration(a.writeKey,
       apiHost: a.apiHost,
       autoAddHightouchDestination: a.autoAddHightouchDestination,
+      collectDeviceId: a.collectDeviceId,
       cdnHost: a.cdnHost,
       debug: a.debug,
       defaultIntegrationSettings: a.defaultIntegrationSettings,
       errorHandler: a.errorHandler,
       flushPolicies: flushPolicies,
+      appStateStream: a.appStateStream,
+      foregroundSessionTimeout: a.foregroundSessionTimeout,
+      backgroundSessionTimeout: a.backgroundSessionTimeout,
       maxBatchSize: a.maxBatchSize,
       requestFactory: a.requestFactory,
       trackApplicationLifecycleEvents: a.trackApplicationLifecycleEvents,

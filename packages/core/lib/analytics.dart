@@ -22,6 +22,8 @@ import 'package:hightouch_events/utils/http_client.dart';
 import 'package:hightouch_events/plugins/inject_user_info.dart';
 import 'package:hightouch_events/plugins/inject_context.dart';
 import 'package:hightouch_events/plugins/inject_token.dart';
+import 'package:hightouch_events/plugins/session/session_plugin.dart';
+import 'package:hightouch_events/plugins/session/session_plugin_helper.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class Analytics with ClientMethods {
@@ -49,6 +51,7 @@ class Analytics with ClientMethods {
     InjectUserInfo(),
     InjectContext(),
   ];
+  Future<void>? _resetInFlight;
 
   void error(Exception exception) {
     reportInternalError(exception, analytics: this);
@@ -62,6 +65,12 @@ class Analytics with ClientMethods {
     this.httpClient = httpClient == null ? HTTPClient(this) : httpClient(this);
 
     state.ready.then((_) => _onStateReady());
+
+    SessionPluginHelper.validateSessionTimeouts(config);
+
+    if (SessionPluginHelper.isEnabled(config)) {
+      addPlugin(SessionPlugin());
+    }
 
     if (config.autoAddHightouchDestination) {
       final hightouchDestination = HightouchDestination();
@@ -180,12 +189,25 @@ class Analytics with ClientMethods {
 
   @override
   Future reset({bool? resetAnonymousId = true}) async {
+    final resetFuture = _performReset(resetAnonymousId: resetAnonymousId);
+    _resetInFlight = resetFuture;
+    try {
+      await resetFuture;
+    } finally {
+      if (_resetInFlight == resetFuture) {
+        _resetInFlight = null;
+      }
+    }
+  }
+
+  Future<void> _performReset({bool? resetAnonymousId = true}) async {
     final anonymousId =
         resetAnonymousId == true ? const Uuid().v4() : (await state.userInfo.state).anonymousId;
 
     state.userInfo.setState(UserInfo(anonymousId));
 
-    getPluginsWithReset(_timeline).forEach((plugin) => plugin.reset());
+    await Future.wait(
+        getPluginsWithReset(_timeline).map((plugin) async => plugin.reset()));
 
     log("Client has been reset", kind: LogFilterKind.debug);
   }
@@ -288,9 +310,16 @@ class Analytics with ClientMethods {
       plugin.clear();
     });
 
+    final multiplexerDispose = state.disposeAppStateStreamMultiplexer();
+    if (future != null) {
+      future = Future.wait([future, multiplexerDispose]);
+    } else {
+      future = multiplexerDispose;
+    }
+
     _destroyed = true;
     _isInitialized = false;
-    return future ?? Future.value();
+    return future;
   }
 
   Future _checkInstalledVersion() async {
@@ -365,14 +394,15 @@ class Analytics with ClientMethods {
 
   void _setupLifecycleEvents() {
     _appStateSubscription?.cancel();
-    _appStateSubscription = state.configuration.state.appStateStream == null
-        ? lifecycle.listen((nextAppState) {
-            _handleAppStateChange(nextAppState);
-          })
-        : state.configuration.state.appStateStream!();
+    _appStateSubscription = state.listenAppState(_handleAppStateChange);
   }
 
   Future _process(RawEvent event) async {
+    final resetInFlight = _resetInFlight;
+    if (resetInFlight != null) {
+      await resetInFlight;
+    }
+
     applyRawEventData(event);
     if (state.isReady) {
       _flushPolicyExecuter.notify(event);

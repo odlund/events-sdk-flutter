@@ -1,3 +1,9 @@
+## 1.1.0
+
+- Added session tracking via `SessionPlugin`, enriching events with a `session` context object and top-level `sessionId` and `sessionStart` fields for parity with the JS SDK.
+- Added configurable `foregroundSessionTimeout` and `backgroundSessionTimeout` options on `Configuration` (default 30 minutes each); set both to `0` to disable session tracking.
+- **Breaking change**: `Configuration.appStateStream` now accepts an `onData` callback so multiple SDK consumers (lifecycle events and session tracking) can share a single subscription. If you override this option, update from `appStateStream: () => ...` to `appStateStream: (onData) => ...` (for example, `appStateStream: (onData) => controller.stream.listen(onData)`).
+
 ## 1.0.5
 
 - Fixed an issue where SDK-generated event timestamps could be sent without UTC normalization, which could shift event times on some devices.
