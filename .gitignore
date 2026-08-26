@@ -31,7 +31,12 @@ build/
 .flutter-plugins
 .flutter-plugins-dependencies
 
-# ASDF 
+# Swift Package Manager
+.build/
+.swiftpm/
+Package.resolved
+
+# ASDF
 .tool-versions
 
 # VSCode
